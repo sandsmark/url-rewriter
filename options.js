@@ -42,7 +42,9 @@ function restore() {
 
 function add_row( event, key, item ) {
 	var rewriteDef = rewriteDefTemplate.clone();
-	
+
+	rewriteDef.find( 'input' ).each( function() { $(this).on( 'input', updateTestOutput ); } );
+
 	if( item )
 	{
 		rewriteDef.find( "[name='regexText']" ).val( item.regex );
@@ -77,7 +79,7 @@ function save() {
 			groupNum: $( this ).find( "[name='groupNumText']" ).val(),
 			replacement: $( this ).find( "[name='replacementText']" ).val(),
 		};
-		if( item.regex.length == 0 || item.groupNum.length == 0 || item.replacement.length == 0 )
+		if( item.regex.length == 0 || item.groupNum.length == 0 )
 		{
 			show_message( "warning", "Please make sure all fields are filled in before saving. Delete any unused rows.", 5 );
 			unusedFields = true;
@@ -100,10 +102,16 @@ function save() {
 	show_message("success", "Saved all rewrite rules.", 5);
 }
 
+function isUrlAbsolute( url ) { 
+    return (url.indexOf('://') > 0 || url.indexOf('//') === 0);
+}
+
 function updateTestOutput()
 {
-	var testInput = $( this ).val();
+	var testInput = $( "#testInputText" ).val();
 	var foundMatch = false;
+
+	$( "#testInputErrorText" ).html( "" )
 	
 	var rewriteDefs = $( ".rewriteDef" ).each( function() {
 		var item = {
@@ -111,17 +119,34 @@ function updateTestOutput()
 			groupNum: $( this ).find( "[name='groupNumText']" ).val(),
 			replacement: $( this ).find( "[name='replacementText']" ).val(),
 		};
-		if( item.regex.length > 0 && item.groupNum.length > 0 && item.replacement.length > 0 )
+		var errText = $( this ).find( "[name='errText']" );
+		if( item.regex.length > 0 && item.groupNum.length > 0 )
 		{
-			var match = testInput.match( new RegExp( item.regex, "i" ) );
+			try
+			{
+				var expr = new RegExp( item.regex, "i" );
+				errText.html( "" );
+			}
+			catch( err ) { errText.html( err.message ); }
+
+			var match = testInput.match( expr );
 			if( match && match.length > item.groupNum )
 			{
 				match[item.groupNum] = item.replacement;
-				$( "#testOutputText" ).val( match.slice( 1 ).join( "" ) );
+				var result = match.slice( 1 ).join( "" );
+				$( "#testOutputText" ).val( result );
+				
+				if( !isUrlAbsolute( result ))
+				{
+					$( "#testInputErrorText" ).html( "One of your rewrite rules is removing the protocol (ex. 'http://' from the URL). Are you sure you want to do this?");
+				}
+				
 				foundMatch = true;
 				return false;
 			}
 		}
+		else errText.html( "" );
 	} );
+
 	if( !foundMatch ) $( "#testOutputText" ).val( "(no match found)" );
 }

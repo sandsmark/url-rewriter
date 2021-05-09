@@ -117,6 +117,12 @@ input[name='replacementText'] { width: 200px; }
 	border-color: #55a12c;
 }
 
+.errorMessage {
+	color:  firebrick;
+    font-weight:  bold;
+	margin-left: 10px;
+}
+
 @keyframes animate-bg {
 	from {
 		background-position: 0 0;

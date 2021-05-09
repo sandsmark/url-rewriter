@@ -29,6 +29,7 @@
 				<td class="formLabelCell">Rewrites to</td>
 				<td><input type="text" class="tableTextBox" id="testOutputText" readonly/></span></td>
 			</tr>
+			<tr><td></td><td><span class="errorMessage" id="testInputErrorText"></span></td></tr>
 		</table>
 	</div><br>
 	<hr/>
@@ -39,10 +40,11 @@
 			If URL matches
 			<input type="text" class="inlineTextBox" name="regexText"/>,<br/>
 			replace text in group number
-			<input type="number" min="0" max="99" class="inlineTextBox" name="groupNumText"/>
+			<input type="number" min="1" max="99" class="inlineTextBox" name="groupNumText"/>
 			with
 			<input type="text" class="inlineTextBox" name="replacementText"/>.
 			<button name="removeBtn" class="removeBtn red">X</button>
+			<div class="errorMessage" name="errText"></div>
 			<hr style="margin-top: 20px;"/>
 		</div>
 	</div>
